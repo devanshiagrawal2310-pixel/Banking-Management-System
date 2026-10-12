@@ -1,0 +1,15 @@
+BANKING MANAGEMENT SYSTEM FLOW
+START
+  |
+Display Menu
+  |
+Read Choice
+  |
+  +-- Create Account --> Validate details --> Store account (in memory) --+
+  +-- Deposit ---------> Find account --> Validate amount --> Update balance
+  +-- Withdraw --------> Find account --> Check balance and daily limit --> Update balance
+  +-- Balance/Details -> Find account --> Display information
+  +-- History ---------> Find account --> Display transactions
+  +-- Exit ------------> END
+  |
+Return to menu
