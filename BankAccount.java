@@ -50,7 +50,7 @@ public class BankAccount {
 
     public void displayDetails() {
         resetDailyLimit();
-        System.out.println("\\nAccount number: " + accountNumber);
+        System.out.println("\nAccount number: " + accountNumber);
         System.out.println("Account holder: " + accountHolder);
         System.out.println("Balance: " + money(balance));
         System.out.println("Daily withdrawal limit: " + money(dailyWithdrawalLimit));
@@ -58,7 +58,7 @@ public class BankAccount {
     }
 
     public void displayTransactions() {
-        System.out.println("\\nTransaction History");
+        System.out.println("\nTransaction History");
         for (String t : transactions) System.out.println(t);
     }
 
@@ -68,5 +68,5 @@ public class BankAccount {
             withdrawnToday = 0;
         }
     }
-    private String money(double amount) { return String.format("₹%.2f", amount); }
+    private String money(double amount) { return String.format("Rs. %.2f", amount); }
 }

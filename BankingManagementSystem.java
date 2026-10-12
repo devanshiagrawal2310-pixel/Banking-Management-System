@@ -11,8 +11,8 @@ public class BankingManagementSystem {
         boolean running = true;
         System.out.println("=== BANKING MANAGEMENT SYSTEM ===");
         while (running) {
-            System.out.println("\\n1. Create Account\\n2. Deposit Money\\n3. Withdraw Money"
-                    + "\\n4. Check Balance\\n5. Account Details\\n6. Transaction History\\n7. Exit");
+            System.out.println("\n1. Create Account\n2. Deposit Money\n3. Withdraw Money"
+                    + "\n4. Check Balance\n5. Account Details\n6. Transaction History\n7. Exit");
             int choice = readInt("Choose: ");
             switch (choice) {
                 case 1 -> createAccount();
@@ -20,7 +20,7 @@ public class BankingManagementSystem {
                 case 3 -> transact(false);
                 case 4 -> {
                     BankAccount a = findAccount();
-                    if (a != null) System.out.printf("Balance: ₹%.2f%n", a.getBalance());
+                    if (a != null) System.out.printf("Balance: Rs. %.2f%n", a.getBalance());
                 }
                 case 5 -> { BankAccount a = findAccount(); if (a != null) a.displayDetails(); }
                 case 6 -> { BankAccount a = findAccount(); if (a != null) a.displayTransactions(); }
@@ -35,7 +35,7 @@ public class BankingManagementSystem {
         String number = readText("Account number: ");
         if (ACCOUNTS.containsKey(number)) { System.out.println("Account already exists."); return; }
         String name = readText("Account holder name: ");
-        double opening = readDouble("Opening balance (₹): ");
+        double opening = readDouble("Opening balance (Rs.): ");
         try {
             BankAccount a = new BankAccount(number, name, opening, DAILY_LIMIT);
             ACCOUNTS.put(number, a);
@@ -54,7 +54,7 @@ public class BankingManagementSystem {
     private static void transact(boolean isDeposit) {
         BankAccount a = findAccount();
         if (a == null) return;
-        double amount = readDouble(isDeposit ? "Deposit amount (₹): " : "Withdrawal amount (₹): ");
+        double amount = readDouble(isDeposit ? "Deposit amount (Rs.): " : "Withdrawal amount (Rs.): ");
         if (isDeposit) a.deposit(amount); else a.withdraw(amount);
     }
 
