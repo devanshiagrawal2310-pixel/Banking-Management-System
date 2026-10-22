@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoBank — Modern Banking Management Dashboard</title>
+    <meta name="description" content="Sleek, modern banking management dashboard with account creation, deposits, withdrawals, daily limit tracking, and real-time backend integration.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="theme-switch-bar">
+        <div class="theme-options">
+            <button id="themeLightBtn" class="theme-pill-btn" onclick="setTheme('light')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                Light theme
+            </button>
+            <button id="themeDarkBtn" class="theme-pill-btn active" onclick="setTheme('dark')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                Dark theme
+            </button>
+        </div>
+        <div class="backend-status-pill" id="backendStatusPill" title="Backend connection status">
+            <span class="status-dot pulse" id="statusDot"></span>
+            <span id="backendStatusText">Connecting to Java Backend...</span>
+        </div>
+    </div>
+
+    <!-- Main Container App Shell -->
+    <div class="dashboard-wrapper">
+        <div class="app-window" id="appWindow">
+
+            <!-- 1. LEFT SIDEBAR -->
+            <aside class="sidebar">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <span>uB</span>
+                    </div>
+                    <span class="brand-name">uBank</span>
+                </div>
+
+                <button class="create-task-btn" id="openCreateAccountBtn" onclick="openModal('createAccountModal')">
+                    <span>Create Account</span>
+                    <span class="btn-icon-circle">+</span>
+                </button>
+
+                <nav class="nav-menu">
+                    <button class="nav-item" data-view="dashboard" onclick="switchNav('dashboard')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-view="analytics" onclick="switchNav('analytics')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        <span>Analytics</span>
+                    </button>
+                    <button class="nav-item" data-view="accounts" onclick="switchNav('accounts')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <span>Accounts</span>
+                    </button>
+                    <button class="nav-item active" data-view="tracking" onclick="switchNav('tracking')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Tracking</span>
+                    </button>
+                    <button class="nav-item" data-view="deposit" onclick="openModal('depositModal')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                        <span>Deposit</span>
+                    </button>
+                    <button class="nav-item" data-view="withdraw" onclick="openModal('withdrawModal')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                        <span>Withdraw</span>
+                    </button>
+                    <button class="nav-item" data-view="transactions" onclick="openModal('transactionsModal')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        <span>History</span>
+                    </button>
+                    <button class="nav-item" data-view="settings" onclick="openModal('detailsModal')">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <span>Account Info</span>
+                    </button>
+                </nav>
+
+                <!-- Sidebar Promo Card (Go Pro style) -->
+                <div class="sidebar-promo-card">
+                    <div class="promo-content">
+                        <h4>Limit Guard</h4>
+                        <p>Daily limit ₹10,000 active for your security</p>
+                        <button class="promo-btn" onclick="openModal('withdrawModal')">Withdraw</button>
+                    </div>
+                    <div class="promo-avatar">
+                        <svg viewBox="0 0 80 100" fill="none" class="promo-svg">
+                            <ellipse cx="40" cy="85" rx="30" ry="8" fill="rgba(0,0,0,0.1)"/>
+                            <circle cx="42" cy="22" r="10" fill="#f8a5c2"/>
+                            <path d="M42 12c-6 0-10 4-10 9 0 5 2 7 4 8 2 2 4 4 6 4s5-2 6-4c2-1 4-3 4-8 0-5-4-9-10-9z" fill="#2d3436"/>
+                            <path d="M36 32h12l8 24-7 1-4-15h-2l-3 15-7-1 3-24z" fill="#f368e0"/>
+                            <path d="M37 56l-3 30h5l2-20 2 20h5l-3-30z" fill="#1e272e"/>
+                            <path d="M48 34l12-10 3 3-11 11z" fill="#f8a5c2"/>
+                        </svg>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 2. MAIN DASHBOARD CONTENT -->
+            <main class="main-content">
+                <!-- Top Header Bar -->
+                <header class="content-header">
+                    <div class="header-left">
+                        <h1 class="page-title">Dashboard</h1>
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="searchInput" placeholder="Search account number or holder..." oninput="handleSearch(this.value)">
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <div class="account-selector-wrapper">
+                            <select id="accountDropdown" onchange="onSelectAccount(this.value)" class="account-select">
+                                <option value="">Loading accounts...</option>
+                            </select>
+                        </div>
+                        <button class="action-circle-btn" onclick="refreshBackendData()" title="Sync with backend">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Welcome Hero Banner -->
+                <section class="welcome-banner">
+                    <div class="floating-notes">
+                        <span class="note note-1">₹</span>
+                        <span class="note note-2">⚡</span>
+                        <span class="note note-3">✓</span>
+                        <span class="note note-4">₹</span>
+                    </div>
+                    <div class="welcome-text">
+                        <span class="welcome-greeting" id="welcomeGreeting">Good morning, Mariya</span>
+                        <h2>Manage your balances & daily limits</h2>
+                        <p>Track deposits, withdrawals, and ₹10,000 daily limits with ease</p>
+                    </div>
+                    <div class="welcome-illustration">
+                        <svg viewBox="0 0 140 120" fill="none" class="desk-svg">
+                            <!-- Desk -->
+                            <rect x="20" y="82" width="100" height="6" rx="3" fill="#303853"/>
+                            <rect x="30" y="88" width="5" height="28" rx="2" fill="#252d43"/>
+                            <rect x="105" y="88" width="5" height="28" rx="2" fill="#252d43"/>
+                            <!-- Chair -->
+                            <rect x="75" y="72" width="22" height="5" rx="2" fill="#576574"/>
+                            <rect x="84" y="77" width="4" height="35" rx="1" fill="#404b5c"/>
+                            <!-- Laptop -->
+                            <path d="M42 66l18-2 2 18-18 2z" fill="#f368e0"/>
+                            <polygon points="38,82 68,80 66,78 40,80" fill="#e056fd"/>
+                            <!-- Person -->
+                            <circle cx="84" cy="40" r="9" fill="#f8a5c2"/>
+                            <path d="M84 31c-5 0-9 4-9 8 0 4 2 6 4 7 2 2 4 3 5 3s4-1 5-3c2-1 4-3 4-7 0-4-4-8-9-8z" fill="#222f3e"/>
+                            <path d="M78 50h14l4 18-5 1-2-10h-6l-2 10-5-1 2-18z" fill="#ff4081"/>
+                            <path d="M80 68l-2 18h5l2-12 3 12h5l-2-18z" fill="#1e272e"/>
+                            <path d="M78 54l-14 12 3 3 13-9z" fill="#f8a5c2"/>
+                        </svg>
+                    </div>
+                </section>
+
+                <!-- Metrics & Daily Limit Gauge Row -->
+                <div class="metrics-row">
+                    <!-- Stat Card 1: Balance -->
+                    <div class="stat-card" onclick="openModal('detailsModal')">
+                        <div class="stat-bars">
+                            <span style="height: 14px;"></span>
+                            <span style="height: 22px;"></span>
+                            <span style="height: 18px;"></span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statBalance">₹5,500.00</span>
+                            <span class="stat-label">Current Balance</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 2: Total Limit -->
+                    <div class="stat-card">
+                        <div class="stat-bars">
+                            <span style="height: 20px;"></span>
+                            <span style="height: 28px;"></span>
+                            <span style="height: 24px;"></span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statDailyLimit">₹10,000.00</span>
+                            <span class="stat-label">Daily Limit</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 3: Withdrawn Today -->
+                    <div class="stat-card">
+                        <div class="stat-bars">
+                            <span style="height: 12px;"></span>
+                            <span style="height: 18px;"></span>
+                            <span style="height: 15px;"></span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statWithdrawnToday">₹500.00</span>
+                            <span class="stat-label">Withdrawn Today</span>
+                        </div>
+                    </div>
+
+                    <!-- Circular Progress Gauge Card -->
+                    <div class="gauge-card">
+                        <div class="donut-container">
+                            <svg class="donut-svg" viewBox="0 0 100 100">
+                                <circle class="donut-bg" cx="50" cy="50" r="40" stroke-width="8"></circle>
+                                <circle class="donut-fill" id="donutProgressCircle" cx="50" cy="50" r="40" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="62.8"></circle>
+                            </svg>
+                            <div class="donut-center-text">
+                                <span class="donut-pct" id="donutPercentText">75%</span>
+                                <span class="donut-sub">Limit Left</span>
+                            </div>
+                        </div>
+                        <div class="gauge-legend">
+                            <div class="legend-item passed">
+                                <span class="legend-dot"></span>
+                                <span class="legend-text" id="legendRemainingText">Remaining: ₹7,500</span>
+                            </div>
+                            <div class="legend-item not-passed">
+                                <span class="legend-dot"></span>
+                                <span class="legend-text" id="legendUsedText">Used: ₹2,500</span>
+                            </div>
+                            <a href="javascript:void(0)" onclick="openModal('withdrawModal')" class="gauge-link">Withdraw &rsaquo;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Curve Chart & Weekly Bars & Transactions -->
+                <div class="charts-grid">
+                    <!-- Left: Activity Spline Wave Chart -->
+                    <div class="chart-card activity-chart-card">
+                        <div class="card-header">
+                            <h3>Activity</h3>
+                            <div class="chip-badge">7 Days</div>
+                        </div>
+                        <div class="wave-chart-container">
+                            <svg class="wave-svg" viewBox="0 0 450 130" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#ff4081" stop-opacity="0.35"/>
+                                        <stop offset="100%" stop-color="#e040fb" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                    <linearGradient id="waveStroke" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stop-color="#f368e0"/>
+                                        <stop offset="50%" stop-color="#ff4081"/>
+                                        <stop offset="100%" stop-color="#9c27b0"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Area fill -->
+                                <path class="wave-area" d="M 0,90 Q 50,40 100,75 T 200,65 T 300,30 T 400,70 L 450,80 L 450,130 L 0,130 Z" fill="url(#waveGradient)"></path>
+                                <!-- Spline curve -->
+                                <path class="wave-line" d="M 0,90 Q 50,40 100,75 T 200,65 T 300,30 T 400,70 L 450,80" fill="none" stroke="url(#waveStroke)" stroke-width="3.5" stroke-linecap="round"></path>
+                                <!-- Active Friday highlight marker -->
+                                <circle cx="300" cy="30" r="5" fill="#ffffff" stroke="#ff4081" stroke-width="3" class="wave-node-dot"></circle>
+                            </svg>
+                            <!-- Tooltip label over the node -->
+                            <div class="wave-marker-label">
+                                <span class="marker-pill" id="waveActiveLabel">₹5,500</span>
+                            </div>
+                        </div>
+                        <div class="days-axis">
+                            <span>Mon</span>
+                            <span>Tue</span>
+                            <span>Wed</span>
+                            <span>Thu</span>
+                            <span class="active-day">20 Fri</span>
+                            <span>Sat</span>
+                            <span>Sun</span>
+                        </div>
+                    </div>
+
+                    <!-- Center Bottom: Spending / Volume Bars -->
+                    <div class="chart-card bar-chart-card">
+                        <div class="bar-chart-header">
+                            <div>
+                                <span class="bar-total-val" id="barWeeklyTotal">₹5,500</span>
+                                <span class="bar-total-sub">balance</span>
+                            </div>
+                            <div class="budget-badge">
+                                <span class="badge-dot"></span>
+                                <span>Limit ₹10k</span>
+                            </div>
+                        </div>
+                        <div class="bars-container">
+                            <div class="bar-col"><div class="bar-fill" style="height: 40%;"></div><span>Mon</span></div>
+                            <div class="bar-col"><div class="bar-fill" style="height: 60%;"></div><span>Tue</span></div>
+                            <div class="bar-col"><div class="bar-fill" style="height: 35%;"></div><span>Wed</span></div>
+                            <div class="bar-col active-bar"><div class="bar-fill" style="height: 85%;"></div><span>Thu</span></div>
+                            <div class="bar-col"><div class="bar-fill" style="height: 95%;"></div><span>Fri</span></div>
+                            <div class="bar-col"><div class="bar-fill" style="height: 50%;"></div><span>Sat</span></div>
+                            <div class="bar-col"><div class="bar-fill" style="height: 25%;"></div><span>Sun</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Right / Bottom: Recent Transactions List -->
+                    <div class="chart-card transactions-card">
+                        <div class="card-header">
+                            <h3>Transactions</h3>
+                            <button class="see-all-btn" onclick="openModal('transactionsModal')">See all</button>
+                        </div>
+                        <div class="transaction-list" id="recentTransactionsList">
+                            <!-- Populated dynamically -->
+                            <div class="tx-item">
+                                <div class="tx-icon-box deposit-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                                </div>
+                                <div class="tx-details">
+                                    <span class="tx-title">Deposit</span>
+                                    <span class="tx-time">Opening balance credited</span>
+                                </div>
+                                <div class="tx-arrow">&rsaquo;</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons Row -->
+                <div class="quick-actions-bar">
+                    <button class="action-btn action-deposit" onclick="openModal('depositModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                        <span>Deposit Money</span>
+                    </button>
+                    <button class="action-btn action-withdraw" onclick="openModal('withdrawModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                        <span>Withdraw Money</span>
+                    </button>
+                    <button class="action-btn action-details" onclick="openModal('detailsModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>Account Details</span>
+                    </button>
+                    <button class="action-btn action-create" onclick="openModal('createAccountModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                        <span>New Account</span>
+                    </button>
+                </div>
+            </main>
+
+            <!-- 3. RIGHT SIDEBAR -->
+            <aside class="right-panel">
+                <div class="right-header">
+                    <span class="right-header-title">My profile</span>
+                    <div class="right-header-icons">
+                        <button class="icon-tiny-btn" onclick="openModal('notificationsModal')" title="Notifications">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </button>
+                        <button class="icon-tiny-btn" onclick="openModal('detailsModal')" title="Settings">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Profile Card -->
+                <div class="user-profile-card">
+                    <div class="profile-top">
+                        <div class="profile-avatar">
+                            <span id="profileAvatarInitials">MS</span>
+                        </div>
+                        <div class="profile-meta">
+                            <span class="profile-greet" id="profileGreetText">Good morning, Mariya</span>
+                            <span class="profile-sub" id="profileSubText">Account #1001 • Active</span>
+                        </div>
+                    </div>
+                    <button class="see-all-pill" onclick="openModal('accountsModal')">See all</button>
+                </div>
+
+                <!-- Calendar & Schedule Widget -->
+                <div class="calendar-widget">
+                    <div class="calendar-top">
+                        <span class="calendar-title">Banking Ledger</span>
+                        <span class="calendar-date" id="calendarDateText">Today</span>
+                    </div>
+
+                    <!-- Mini Month Calendar Grid -->
+                    <div class="mini-calendar">
+                        <div class="cal-days-header">
+                            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                        </div>
+                        <div class="cal-days-grid" id="calDaysGrid">
+                            <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                            <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                            <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                            <span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span class="today-highlight">22</span>
+                            <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span>
+                            <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Schedule with Colored Pills (as shown in design) -->
+                    <div class="schedule-timeline" id="scheduleTimeline">
+                        <div class="time-row">
+                            <span class="time-label">09:00</span>
+                            <div class="event-pill event-lavender" onclick="openModal('transactionsModal')">
+                                <span class="pill-dot"></span>
+                                <span>Account Opened</span>
+                            </div>
+                        </div>
+                        <div class="time-row">
+                            <span class="time-label">11:00</span>
+                            <div class="event-pill event-pink" onclick="openModal('transactionsModal')">
+                                <span class="pill-dot"></span>
+                                <span>Deposit Completed</span>
+                            </div>
+                        </div>
+                        <div class="time-row">
+                            <span class="time-label">01:00</span>
+                            <div class="event-pill event-purple" onclick="openModal('transactionsModal')">
+                                <span class="pill-dot"></span>
+                                <span>Withdrawal Verified</span>
+                            </div>
+                        </div>
+                        <div class="time-row">
+                            <span class="time-label">03:00</span>
+                            <div class="time-line-empty"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Decorative Floating Coil (matches reference mockup) -->
+                <div class="coil-decoration">
+                    <svg viewBox="0 0 80 80" class="spiral-svg">
+                        <defs>
+                            <linearGradient id="spiralGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#ff4081"/>
+                                <stop offset="50%" stop-color="#e040fb"/>
+                                <stop offset="100%" stop-color="#8c7ae6"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M 50,15 C 65,15 75,25 70,40 C 65,55 45,65 30,60 C 15,55 10,40 20,30 C 30,20 45,25 50,35 C 55,45 45,55 35,52" fill="none" stroke="url(#spiralGrad)" stroke-width="10" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS FOR BANKING OPERATIONS ==================== -->
+
+    <!-- 1. Create Account Modal -->
+    <div class="modal-overlay" id="createAccountModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Create New Account</h3>
+                <button class="modal-close-btn" onclick="closeModal('createAccountModal')">&times;</button>
+            </div>
+            <form id="createAccountForm" onsubmit="handleCreateAccount(event)">
+                <div class="form-group">
+                    <label for="createAccNumber">Account Number</label>
+                    <input type="text" id="createAccNumber" placeholder="e.g. 1002" required>
+                </div>
+                <div class="form-group">
+                    <label for="createAccHolder">Account Holder Name</label>
+                    <input type="text" id="createAccHolder" placeholder="e.g. Devanshi Agrawal" required>
+                </div>
+                <div class="form-group">
+                    <label for="createAccBalance">Opening Balance (₹)</label>
+                    <input type="number" id="createAccBalance" placeholder="e.g. 5000" min="0" step="0.01" required>
+                </div>
+                <div class="info-notice">
+                    <span>🛡️ Daily withdrawal limit is set to <strong>₹10,000.00</strong> as per bank policy.</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createAccountModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" id="createAccountSubmitBtn">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Deposit Modal -->
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Deposit Money</h3>
+                <button class="modal-close-btn" onclick="closeModal('depositModal')">&times;</button>
+            </div>
+            <form id="depositForm" onsubmit="handleDeposit(event)">
+                <div class="form-group">
+                    <label for="depositAccNumber">Select Account</label>
+                    <select id="depositAccNumber" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="depositAmount">Deposit Amount (₹)</label>
+                    <input type="number" id="depositAmount" placeholder="e.g. 1000" min="1" step="0.01" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('depositModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" id="depositSubmitBtn">Confirm Deposit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Withdraw Modal -->
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Withdraw Money</h3>
+                <button class="modal-close-btn" onclick="closeModal('withdrawModal')">&times;</button>
+            </div>
+            <form id="withdrawForm" onsubmit="handleWithdraw(event)">
+                <div class="form-group">
+                    <label for="withdrawAccNumber">Select Account</label>
+                    <select id="withdrawAccNumber" onchange="updateWithdrawalLimitsDisplay()" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="withdrawAmount">Withdrawal Amount (₹)</label>
+                    <input type="number" id="withdrawAmount" placeholder="e.g. 500" min="1" step="0.01" required>
+                </div>
+                <div class="limit-status-box" id="withdrawLimitInfo">
+                    <div class="limit-row">
+                        <span>Current Balance:</span>
+                        <strong id="withdrawModalBalance">₹0.00</strong>
+                    </div>
+                    <div class="limit-row">
+                        <span>Daily Limit:</span>
+                        <span>₹10,000.00</span>
+                    </div>
+                    <div class="limit-row">
+                        <span>Remaining Limit Today:</span>
+                        <strong id="withdrawModalRemaining" class="accent-text">₹10,000.00</strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('withdrawModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" id="withdrawSubmitBtn">Confirm Withdrawal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. Account Details Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Account Details & Balance</h3>
+                <button class="modal-close-btn" onclick="closeModal('detailsModal')">&times;</button>
+            </div>
+            <div class="account-details-view" id="accountDetailsView">
+                <div class="detail-badge-header">
+                    <div class="detail-avatar" id="detailAvatarInitials">MS</div>
+                    <div>
+                        <h4 id="detailHolderName">Mariya Sharma</h4>
+                        <span id="detailAccountNumber">Account #1001</span>
+                    </div>
+                </div>
+                <div class="detail-grid">
+                    <div class="detail-box">
+                        <span class="detail-label">Current Balance</span>
+                        <span class="detail-value highlight" id="detailBalance">₹5,500.00</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Daily Withdrawal Limit</span>
+                        <span class="detail-value" id="detailLimit">₹10,000.00</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Withdrawn Today</span>
+                        <span class="detail-value" id="detailWithdrawnToday">₹500.00</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Remaining Limit</span>
+                        <span class="detail-value" id="detailRemainingLimit">₹9,500.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="openModal('transactionsModal')">View Transactions</button>
+                <button type="button" class="btn-primary" onclick="closeModal('detailsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. All Accounts Modal -->
+    <div class="modal-overlay" id="accountsModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3>All Bank Accounts</h3>
+                <button class="modal-close-btn" onclick="closeModal('accountsModal')">&times;</button>
+            </div>
+            <div class="accounts-table-wrapper">
+                <table class="custom-table" id="accountsTable">
+                    <thead>
+                        <tr>
+                            <th>Account #</th>
+                            <th>Holder Name</th>
+                            <th>Balance</th>
+                            <th>Daily Limit</th>
+                            <th>Withdrawn Today</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountsTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-primary" onclick="openModal('createAccountModal')">+ Create New Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Transaction History Modal -->
+    <div class="modal-overlay" id="transactionsModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3>Transaction History — <span id="txHistoryAccTitle">#1001</span></h3>
+                <button class="modal-close-btn" onclick="closeModal('transactionsModal')">&times;</button>
+            </div>
+            <div class="transactions-full-list" id="txHistoryFullList">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('transactionsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
