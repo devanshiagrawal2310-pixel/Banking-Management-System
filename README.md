@@ -1,25 +1,28 @@
 # Banking Management System — Java Mini Project
 
 ## Features
-- Create bank accounts
-- Deposit and withdraw money
-- Daily withdrawal limit of ₹10,000
-- Balance inquiry and account details
-- Transaction history for the current session
-- Input validation and duplicate-account checks
+- Create bank accounts with validation
+- Deposit and withdraw money with real-time balance calculations
+- Daily withdrawal limit of ₹10,000 strictly enforced
+- Balance inquiry and comprehensive account details
+- Complete transaction history
+- **Modern Dashboard Frontend**: Replicated from modern dark/light UI design with activity wave charts, spending bars, circular daily limit gauge, and ledger timeline.
+- **Pure Java REST Backend**: Zero external dependencies using standard JDK `HttpServer`.
 
-## Run on Windows
-Install JDK 17 or later. Open Command Prompt inside this folder and run:
-
+## Run Dashboard & Web UI (Recommended)
+1. Double click [`run.bat`](file:///c:/Banking%20managemnt%20system/Banking-Management-System/run.bat) or run in terminal:
 ```bat
-javac -d out src\BankAccount.java src\BankingManagementSystem.java
-java -cp out BankingManagementSystem
+javac BankAccount.java BankingManagementSystem.java BankingWebServer.java
+java BankingWebServer 8080
 ```
+2. Open your browser to [http://localhost:8080](http://localhost:8080).
 
-If `javac` is not recognized, install a JDK and configure PATH.
+## Run Console CLI Mode
+```bat
+javac BankAccount.java BankingManagementSystem.java
+java BankingManagementSystem
+```
+(You can also start the Web Server directly from Menu Option 7 in the CLI).
 
 ## Demo
-Create account 1001 for Asha with ₹5,000. Deposit ₹1,000, withdraw ₹500, and check the balance: ₹5,500.
-
-## Limitation
-This is an academic console prototype, not a real banking system. Data is held in memory and is cleared when the program exits. No real bank or payment service is connected.
+Create account 1001 for Mariya / Asha with ₹5,000. Deposit ₹1,000, withdraw ₹500, and check the balance: ₹5,500. Daily withdrawal limit remaining: ₹9,500.

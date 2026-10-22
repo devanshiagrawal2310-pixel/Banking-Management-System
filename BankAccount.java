@@ -24,6 +24,11 @@ public class BankAccount {
     public String getAccountNumber() { return accountNumber; }
     public String getAccountHolder() { return accountHolder; }
     public double getBalance() { return balance; }
+    public double getDailyWithdrawalLimit() { return dailyWithdrawalLimit; }
+    public double getWithdrawnToday() { resetDailyLimit(); return withdrawnToday; }
+    public double getRemainingLimit() { resetDailyLimit(); return Math.max(0, dailyWithdrawalLimit - withdrawnToday); }
+    public List<String> getTransactions() { return new ArrayList<>(transactions); }
+    public LocalDate getWithdrawalDate() { return withdrawalDate; }
 
     public boolean deposit(double amount) {
         if (amount <= 0) { System.out.println("Amount must be greater than zero."); return false; }
